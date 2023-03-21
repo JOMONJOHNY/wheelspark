@@ -1,13 +1,16 @@
 package intense.pluto.wheelspark
 
 import android.graphics.BitmapFactory
+import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -24,8 +27,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import intense.pluto.wheelspark.ui.theme.WheelsParkTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,35 +41,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WheelsParkTheme {
-                IntroScreen()
-//                val navController = rememberNavController()
-//                NavHost(
-//                    navController = navController,
-//                    startDestination = "first_screen"
-//                ) {
-//                    composable("first_screen") {
-//                        // first screen
-//                    }
-//                    composable("second_screen") {
-//                        // second screen
-//                    }
-//                }
+
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "login") {
+                    composable("intro") { IntroScreen{navController.navigate("login")} }
+                    composable("login") { LoginScreen() }
+                }
             }
         }
     }
 
-//    @Composable
-//    fun MyApp() {
-//        val navController = rememberNavController()
-//        NavHost(navController = navController, startDestination = "home") {
-//            composable("home") { HomeScreen() }
-//            composable("details") { DetailsScreen() }
-//        }
-//    }
 
 
     @Composable
-    fun IntroScreen() {
+    fun IntroScreen(onclick: () -> Unit) {
         val bgCar = remember { BitmapFactory.decodeResource(resources, R.drawable.bgcar).asImageBitmap() }
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -89,7 +82,7 @@ class MainActivity : ComponentActivity() {
                         .padding(40.dp),
                    contentAlignment = Alignment.BottomCenter
                 ){
-                    PWButton(modifier = Modifier.width(300.dp), text = "Explore"){}
+                    PWButton(modifier = Modifier.width(300.dp), text = "Explore",onclick)
                 }
             }
         }
@@ -143,6 +136,40 @@ fun FadeInImagePreview() {
     LaunchedEffect(Unit) {
         isVisible = true
     }
+}
+
+
+@Preview
+@Composable
+fun LoginScreen(){
+    Box(modifier = Modifier.fillMaxSize()){
+        Image(painter = painterResource(id = R.drawable.bg2),
+            contentDescription=null,
+            Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds)
+        Column(Modifier.fillMaxSize()) {
+            ProviderButton(providername = "Google",R.drawable.google)
+            ProviderButton(providername = "Facebook",R.drawable.fb,Color(0xFF485A96))
+            ProviderButton(providername = "Twitter",R.drawable.twitter,color=Color(0xFF0CB6FF))
+        }
+    }
+}
+@Composable
+fun ProviderButton(providername:String="Google",@DrawableRes id: Int,color: Color=Color.White){
+    Button(onClick = {},
+        colors = ButtonDefaults.buttonColors(backgroundColor = color)
+            , modifier = Modifier.width(320.dp)
+    ){
+        Row(
+            Modifier.fillMaxWidth(1f),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Image(modifier= Modifier
+                .width(30.dp),painter = painterResource(id = id),contentDescription = null)
+
+            Text(modifier = Modifier.padding(start = 30.dp), text = "Continue with $providername", style = TextStyle(fontWeight = W700, fontSize = 18.sp))
+        }
+           }
 }
 
 
